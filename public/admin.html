@@ -14,7 +14,9 @@
     <div id="login-form" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
         <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
         <form id="loginForm" class="space-y-4">
-            <input type="hidden" name="username" autocomplete="username" value="admin">
+            <!-- <input type="hidden" name="username" autocomplete="username" value="admin"> -->
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" id="username" name="username" value="admin" autocomplete="username" readonly class="sr-only" />
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                 <input type="password" id="password" name="password" required
@@ -31,52 +33,53 @@
     <div id="admin-panel" class="hidden w-full max-w-2xl bg-white p-6 rounded-lg shadow-xl space-y-6">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">Admin Dashboard</h1>
 
-        <div class="border-b pb-4">
+        <div class="border-b mb-6">
             <h2 id="form-title" class="text-xl font-semibold mb-4">Add New Game</h2>
             <form id="gameForm" class="space-y-4">
-                <fieldset class="border border-gray-300 p-2 rounded-md">
+                <fieldset class="border border-gray-300 p-4 rounded-md">
                     <legend class="text-lg font-semibold">Game Information</legend>
 
                     <input type="hidden" id="gameId" name="id">
 
                     <label for="gameName" class="block font-medium">Game Name:</label>
                     <input type="text" id="gameName" name="name" placeholder="Game Name" required
-                        class="w-full mb-2 border rounded-md">
+                        class="w-full mb-2 border rounded-md px-3 py-2">
 
                     <label for="gameBonus" class="block font-medium">Sign Up Bonus:</label>
                     <input type="text" id="gameBonus" name="bonus" placeholder="e.g., 51" required
-                        class="w-full mb-2 border rounded-md">
+                        class="w-full mb-2 border rounded-md px-3 py-2">
 
                     <label for="gameWithdraw" class="block font-medium">Minimum Withdraw Amount:</label>
                     <input type="text" id="gameWithdraw" name="withdraw" placeholder="e.g., 100" required
-                        class="w-full mb-2 border rounded-md">
+                        class="w-full mb-2 border rounded-md px-3 py-2">
 
                     <label for="gameImageUrl" class="block font-medium">Image URL:</label>
                     <input type="text" id="gameImageUrl" name="imageUrl" placeholder="e.g., https://..." required
-                        class="w-full mb-2 border rounded-md">
+                        class="w-full mb-2 border rounded-md px-3 py-2">
 
                     <label for="gameDownloadUrl" class="block font-medium">Download URL:</label>
                     <input type="url" id="gameDownloadUrl" name="downloadUrl" placeholder="e.g., https://..." required
-                        class="w-full border mb-2 rounded-md">
+                        class="w-full mb-2 border rounded-md px-3 py-2">
 
                     <label for="gameType" class="block font-medium">Select Game Type:</label>
-                    <select id="gameType" name="type" required class="w-full border rounded-md mb-2">
+                    <select id="gameType" name="type" required class="w-full border rounded-md mb-4 px-3 py-2">
                         <option value="new">New Game</option>
                         <option value="other">Other Game</option>
                     </select>
 
                     <button type="submit" id="submitBtn"
-                        class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">
+                        class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors mb-2">
                         Add Game
                     </button>
+
                     <button type="button" id="cancelBtn"
                         class="w-full bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500 transition-colors hidden">
                         Cancel Edit
                     </button>
                 </fieldset>
             </form>
-
         </div>
+
 
         <div>
             <h2 class="text-xl font-semibold mb-4">Current Games</h2>
@@ -84,7 +87,7 @@
         </div>
         <a href="/" class="block mt-6 text-center text-blue-600 hover:underline">Go to Home Page</a>
     </div>
-
+    
     <script>
         const loginForm = document.getElementById('loginForm');
         const adminPanel = document.getElementById('admin-panel');
