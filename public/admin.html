@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body class="bg-gray-100 font-sans flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="login-form" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
+        <form id="loginForm" class="space-y-4">
+            <input type="hidden" name="username" autocomplete="username" value="admin">
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    autocomplete="current-password">
+            </div>
+            <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition-colors">Log
+                In</button>
+            <div id="login-message" class="text-center text-red-500 mt-2 hidden"></div>
+        </form>
+    </div>
+
+    <div id="admin-panel" class="hidden w-full max-w-2xl bg-white p-6 rounded-lg shadow-xl space-y-6">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">Admin Dashboard</h1>
+
+        <div class="border-b pb-4">
+            <h2 id="form-title" class="text-xl font-semibold mb-4">Add New Game</h2>
+            <form id="gameForm" class="space-y-4">
+                <fieldset class="border border-gray-300 p-2 rounded-md">
+                    <legend class="text-lg font-semibold">Game Information</legend>
+
+                    <input type="hidden" id="gameId" name="id">
+
+                    <label for="gameName" class="block font-medium">Game Name:</label>
+                    <input type="text" id="gameName" name="name" placeholder="Game Name" required
+                        class="w-full mb-2 border rounded-md">
+
+                    <label for="gameBonus" class="block font-medium">Sign Up Bonus:</label>
+                    <input type="text" id="gameBonus" name="bonus" placeholder="e.g., 51" required
+                        class="w-full mb-2 border rounded-md">
+
+                    <label for="gameWithdraw" class="block font-medium">Minimum Withdraw Amount:</label>
+                    <input type="text" id="gameWithdraw" name="withdraw" placeholder="e.g., 100" required
+                        class="w-full mb-2 border rounded-md">
+
+                    <label for="gameImageUrl" class="block font-medium">Image URL:</label>
+                    <input type="text" id="gameImageUrl" name="imageUrl" placeholder="e.g., https://..." required
+                        class="w-full mb-2 border rounded-md">
+
+                    <label for="gameDownloadUrl" class="block font-medium">Download URL:</label>
+                    <input type="url" id="gameDownloadUrl" name="downloadUrl" placeholder="e.g., https://..." required
+                        class="w-full border mb-2 rounded-md">
+
+                    <label for="gameType" class="block font-medium">Select Game Type:</label>
+                    <select id="gameType" name="type" required class="w-full border rounded-md mb-2">
+                        <option value="new">New Game</option>
+                        <option value="other">Other Game</option>
+                    </select>
+
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">
+                        Add Game
+                    </button>
+                    <button type="button" id="cancelBtn"
+                        class="w-full bg-gray-400 text-white py-2 rounded-md hover:bg-gray-500 transition-colors hidden">
+                        Cancel Edit
+                    </button>
+                </fieldset>
+            </form>
+
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4">Current Games</h2>
+            <div id="gamesList" class="space-y-4"></div>
+        </div>
+        <a href="/" class="block mt-6 text-center text-blue-600 hover:underline">Go to Home Page</a>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginMessage = document.getElementById('login-message');
+        const gameForm = document.getElementById('gameForm');
+        const gamesList = document.getElementById('gamesList');
+        const gameIdInput = document.getElementById('gameId');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        let allGames = [];
+
+        const fetchGames = async () => {
+            try {
+                const response = await fetch('/api/games');
+                if (!response.ok) throw new Error('Failed to fetch games');
+                allGames = await response.json();
+                renderGames();
+            } catch (error) {
+                console.error("Error fetching games:", error);
+                gamesList.innerHTML = '<div class="text-center text-gray-500">Error loading games.</div>';
+            }
+        };
+
+        const renderGames = () => {
+            gamesList.innerHTML = '';
+            if (allGames.length === 0) {
+                gamesList.innerHTML = '<div class="text-center text-gray-500">No games found.</div>';
+                return;
+            }
+            allGames.forEach(game => {
+                const gameDiv = document.createElement('div');
+                gameDiv.className = 'flex items-center justify-between bg-gray-50 p-4 rounded-md border';
+                gameDiv.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <img src="${game.imageUrl}" alt="${game.name} Logo" class="w-10 h-10 rounded-xl" />
+                        <div>
+                            <h4 class="font-bold">${game.name}</h4>
+                            <p class="text-xs text-gray-500">Type: ${game.type}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="edit-btn bg-blue-500 text-white text-xs px-3 py-1 rounded-md">Edit</button>
+                        <button class="delete-btn bg-red-500 text-white text-xs px-3 py-1 rounded-md">Delete</button>
+                    </div>
+                `;
+                gameDiv.querySelector('.edit-btn').addEventListener('click', () => handleEdit(game));
+                gameDiv.querySelector('.delete-btn').addEventListener('click', () => handleDelete(game.id));
+                gamesList.appendChild(gameDiv);
+            });
+        };
+
+        const handleEdit = (game) => {
+            gameIdInput.value = game.id;
+            document.getElementById('gameName').value = game.name;
+            document.getElementById('gameBonus').value = game.bonus;
+            document.getElementById('gameWithdraw').value = game.withdraw;
+            document.getElementById('gameImageUrl').value = game.imageUrl;
+            document.getElementById('gameDownloadUrl').value = game.downloadUrl;
+            document.getElementById('gameType').value = game.type;
+            formTitle.textContent = 'Edit Game';
+            submitBtn.textContent = 'Save Changes';
+            cancelBtn.classList.remove('hidden');
+        };
+
+        const handleDelete = async (id) => {
+            if (confirm("Are you sure you want to delete this game?")) {
+                try {
+                    const password = prompt("Please enter the password to confirm deletion:");
+                    if (password) {
+                        const response = await fetch(`/api/admin/games/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ password })
+                        });
+                        if (!response.ok) throw new Error('Failed to delete game');
+                        fetchGames(); // Refresh the list
+                    }
+                } catch (error) {
+                    alert('Error deleting game.');
+                    console.error("Error deleting game:", error);
+                }
+            }
+        };
+
+        gameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = gameIdInput.value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/admin/games/${id}` : '/api/admin/games';
+
+            const gameData = {
+                password: prompt("Please enter the password to save changes:"),
+                name: document.getElementById('gameName').value,
+                bonus: document.getElementById('gameBonus').value,
+                withdraw: document.getElementById('gameWithdraw').value,
+                imageUrl: document.getElementById('gameImageUrl').value,
+                downloadUrl: document.getElementById('gameDownloadUrl').value,
+                type: document.getElementById('gameType').value,
+            };
+
+            if (!gameData.password) return;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(gameData)
+                });
+                if (!response.ok) throw new Error('Failed to save game');
+
+                gameForm.reset();
+                gameIdInput.value = '';
+                formTitle.textContent = 'Add New Game';
+                submitBtn.textContent = 'Add Game';
+                cancelBtn.classList.add('hidden');
+
+                fetchGames(); // Refresh the list
+            } catch (error) {
+                alert('Error saving game.');
+                console.error("Error saving game:", error);
+            }
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            gameForm.reset();
+            gameIdInput.value = '';
+            formTitle.textContent = 'Add New Game';
+            submitBtn.textContent = 'Add Game';
+            cancelBtn.classList.add('hidden');
+        });
+
+        // Login form logic
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                if (response.ok) {
+                    document.getElementById('login-form').classList.add('hidden');
+                    adminPanel.classList.remove('hidden');
+                    fetchGames();
+                } else {
+                    loginMessage.textContent = 'Invalid password.';
+                    loginMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                loginMessage.textContent = 'Server error. Please try again.';
+                loginMessage.classList.remove('hidden');
+                console.error("Login error:", error);
+            }
+        });
+    </script>
+</body>
+
+</html>
